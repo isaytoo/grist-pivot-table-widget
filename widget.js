@@ -153,7 +153,7 @@ function renderPivotTable(records, columns) {
   // Prepare data for WebDataRocks
   const data = records;
   
-  // Create WebDataRocks pivot
+  // Create WebDataRocks pivot with modern theme
   pivot = new WebDataRocks({
     container: '#pivot-container',
     toolbar: true,
@@ -163,26 +163,149 @@ function renderPivotTable(records, columns) {
       dataSource: {
         data: data
       },
+      slice: {
+        rows: [],
+        columns: [],
+        measures: []
+      },
       options: {
         grid: {
           type: 'compact',
           showTotals: 'on',
-          showGrandTotals: 'on'
+          showGrandTotals: 'on',
+          showHeaders: true
         },
-        configuratorActive: true,
+        configuratorActive: false,
         configuratorButton: true,
-        showAggregationLabels: true
-      },
-      localization: currentLanguage === 'fr' ? 'https://cdn.webdatarocks.com/loc/fr.json' : undefined
-    },
-    reportcomplete: function() {
-      // Save configuration when report changes
-      saveConfiguration();
+        showAggregationLabels: true,
+        datePattern: 'dd/MM/yyyy',
+        showEmptyData: false
+      }
     },
     global: {
       localization: currentLanguage === 'fr' ? 'https://cdn.webdatarocks.com/loc/fr.json' : undefined
+    },
+    reportcomplete: function() {
+      // Apply custom theme after render
+      applyCustomTheme();
+    },
+    reportchange: function() {
+      // Save configuration when report changes
+      saveConfiguration();
     }
   });
+}
+
+function applyCustomTheme() {
+  // Apply isaytoo theme colors via CSS injection
+  const style = document.createElement('style');
+  style.textContent = `
+    /* WebDataRocks isaytoo Theme */
+    #wdr-pivot-view .wdr-ui-element {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    }
+    
+    /* Toolbar */
+    #wdr-toolbar {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+      border-bottom: 2px solid #0ea5e9 !important;
+    }
+    #wdr-toolbar .wdr-toolbar-group-content {
+      gap: 4px !important;
+    }
+    #wdr-toolbar .wdr-ui-btn {
+      background: white !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 8px !important;
+      color: #475569 !important;
+      transition: all 0.2s ease !important;
+    }
+    #wdr-toolbar .wdr-ui-btn:hover {
+      background: #0ea5e9 !important;
+      color: white !important;
+      border-color: #0ea5e9 !important;
+    }
+    
+    /* Grid headers */
+    .wdr-header, .wdr-header-r, .wdr-header-c {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+      color: white !important;
+      font-weight: 600 !important;
+    }
+    
+    /* Totals */
+    .wdr-total, .wdr-grand-total {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+      color: #92400e !important;
+      font-weight: 700 !important;
+    }
+    
+    /* Cells */
+    .wdr-cell {
+      border-color: #e2e8f0 !important;
+    }
+    .wdr-cell:hover {
+      background: #f0f9ff !important;
+    }
+    
+    /* Configurator */
+    .wdr-popup-header {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+      color: white !important;
+    }
+    .wdr-fields-view-wrap {
+      background: #f8fafc !important;
+    }
+    .wdr-field {
+      background: white !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 6px !important;
+      margin: 4px !important;
+    }
+    .wdr-field:hover {
+      border-color: #0ea5e9 !important;
+      box-shadow: 0 2px 8px rgba(14, 165, 233, 0.15) !important;
+    }
+    .wdr-field.wdr-checked {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+      color: white !important;
+      border-color: #0284c7 !important;
+    }
+    
+    /* Drop zones */
+    .wdr-fields-section-header {
+      background: #f1f5f9 !important;
+      color: #475569 !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      font-size: 11px !important;
+      letter-spacing: 0.5px !important;
+    }
+    .wdr-fields-section-content {
+      background: white !important;
+      border: 2px dashed #cbd5e1 !important;
+      border-radius: 8px !important;
+      min-height: 60px !important;
+    }
+    .wdr-fields-section-content:empty::before {
+      content: "Déposez un champ ici" !important;
+      color: #94a3b8 !important;
+      font-style: italic !important;
+    }
+    
+    /* Buttons */
+    .wdr-ui-btn-primary {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+      border: none !important;
+      border-radius: 8px !important;
+      color: white !important;
+      font-weight: 600 !important;
+    }
+    .wdr-ui-btn-primary:hover {
+      filter: brightness(1.1) !important;
+    }
+  `;
+  document.head.appendChild(style);
 }
 
 // =============================================================================
