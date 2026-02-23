@@ -364,56 +364,67 @@
       border: 1px solid #e2e8f0 !important;
     }
     
-    /* Sélecteur de type de rendu (Table, Carte de chaleur, etc.) */
-    .pvtRenderer {
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+    /* Tous les sélecteurs dans la zone pivot */
+    .pvtUi select,
+    .pvtRenderer,
+    .pvtAggregator {
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
       border: 2px solid #0ea5e9 !important;
       border-radius: 10px !important;
-      padding: 8px 14px !important;
+      padding: 10px 16px !important;
       font-size: 13px !important;
       font-weight: 600 !important;
       color: #0369a1 !important;
       cursor: pointer !important;
       transition: all 0.2s ease !important;
-      box-shadow: 0 2px 6px rgba(14, 165, 233, 0.15) !important;
+      box-shadow: 0 2px 8px rgba(14, 165, 233, 0.15) !important;
+      appearance: none !important;
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230ea5e9' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 12px center !important;
+      padding-right: 36px !important;
+      min-width: 140px !important;
     }
-    .pvtRenderer:hover {
+    .pvtUi select:hover,
+    .pvtRenderer:hover,
+    .pvtAggregator:hover {
       background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%) !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230284c7' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 12px center !important;
       transform: translateY(-1px) !important;
       box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25) !important;
     }
-    .pvtRenderer:focus {
-      outline: none !important;
-      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3) !important;
-    }
-    
-    /* Sélecteur d'agrégation (Somme, Moyenne, etc.) */
-    .pvtAggregator {
-      background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%) !important;
-      border: 2px solid #ec4899 !important;
-      border-radius: 10px !important;
-      padding: 8px 14px !important;
-      font-size: 13px !important;
-      font-weight: 600 !important;
-      color: #be185d !important;
-      cursor: pointer !important;
-      transition: all 0.2s ease !important;
-      box-shadow: 0 2px 6px rgba(236, 72, 153, 0.15) !important;
-    }
-    .pvtAggregator:hover {
-      background: linear-gradient(135deg, #fbcfe8 0%, #f9a8d4 100%) !important;
-      transform: translateY(-1px) !important;
-      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.25) !important;
-    }
+    .pvtUi select:focus,
+    .pvtRenderer:focus,
     .pvtAggregator:focus {
       outline: none !important;
-      box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.3) !important;
+      border-color: #0284c7 !important;
+      box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.25) !important;
     }
     
-    .pvtAggregator:focus, .pvtRenderer:focus {
-      outline: none !important;
-      border-color: #0ea5e9 !important;
-      box-shadow: 0 0 0 3px rgba(14,165,233,0.2) !important;
+    /* Style spécifique pour l'agrégateur (rose) */
+    .pvtVals select {
+      background: linear-gradient(135deg, #ffffff 0%, #fce7f3 100%) !important;
+      border: 2px solid #ec4899 !important;
+      color: #be185d !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ec4899' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 12px center !important;
+      box-shadow: 0 2px 8px rgba(236, 72, 153, 0.15) !important;
+    }
+    .pvtVals select:hover {
+      background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%) !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23db2777' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 12px center !important;
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.25) !important;
+    }
+    .pvtVals select:focus {
+      border-color: #db2777 !important;
+      box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.25) !important;
     }
 
     /* ========== FULLSCREEN MODE ========== */
