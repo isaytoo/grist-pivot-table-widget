@@ -1,0 +1,375 @@
+<!--
+  Grist Pivot Table Widget
+  Copyright 2026 Said Hamadou (isaytoo)
+  Licensed under the Apache License, Version 2.0
+  https://github.com/isaytoo/grist-pivot-table-widget
+-->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pivot Table - Tableau Croisé Dynamique</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  
+  <!-- Grist Plugin API -->
+  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+  
+  <!-- jQuery & jQuery UI for drag & drop -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+  
+  <!-- PivotTable.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.23.0/pivot.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.23.0/pivot.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.23.0/pivot.fr.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.23.0/export_renderers.min.js"></script>
+  
+  <style>
+    /* ========== RESET & BASE ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #f8fafc;
+      min-height: 100vh;
+    }
+    .hidden { display: none !important; }
+
+    /* ========== HEADER ========== */
+    .header {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: white;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header h1 { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    
+    .lang-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .lang-btn:hover { background: rgba(255,255,255,0.3); }
+    .lang-btn.active { background: white; color: #0284c7; }
+
+    /* ========== CONTROLS BAR ========== */
+    .controls-bar {
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .control-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+    }
+    .control-group select {
+      padding: 5px 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 12px;
+      background: white;
+      cursor: pointer;
+    }
+    .control-group select:focus {
+      outline: none;
+      border-color: #0ea5e9;
+      box-shadow: 0 0 0 2px rgba(14,165,233,0.2);
+    }
+
+    /* ========== BUTTONS ========== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: white;
+    }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+    }
+    .btn-secondary:hover { background: #e2e8f0; }
+
+    /* ========== MAIN CONTENT ========== */
+    .main-content {
+      padding: 16px;
+    }
+
+    /* ========== PIVOT TABLE CONTAINER ========== */
+    #pivot-container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    /* ========== PIVOT TABLE STYLES ========== */
+    .pvtUi {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    }
+    .pvtAxisContainer, .pvtVals {
+      background: #f8fafc !important;
+      border: 1px dashed #cbd5e1 !important;
+      border-radius: 6px !important;
+      min-height: 60px !important;
+    }
+    .pvtAxisContainer li span.pvtAttr {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 4px !important;
+      padding: 4px 8px !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+    }
+    .pvtAxisContainer li span.pvtAttr:hover {
+      filter: brightness(1.1);
+    }
+    .pvtUnused li span.pvtAttr {
+      background: #e2e8f0 !important;
+      color: #475569 !important;
+    }
+    .pvtUnused li span.pvtAttr:hover {
+      background: #cbd5e1 !important;
+    }
+    .pvtTable {
+      border-collapse: collapse !important;
+      font-size: 12px !important;
+    }
+    .pvtTable th, .pvtTable td {
+      border: 1px solid #e2e8f0 !important;
+      padding: 6px 10px !important;
+    }
+    .pvtTable th {
+      background: #f1f5f9 !important;
+      font-weight: 600 !important;
+      color: #334155 !important;
+    }
+    .pvtTable td {
+      background: white !important;
+    }
+    .pvtTable .pvtTotal, .pvtTable .pvtGrandTotal {
+      background: #fef3c7 !important;
+      font-weight: 700 !important;
+    }
+    .pvtRendererArea {
+      padding: 16px !important;
+    }
+    .pvtDropdown {
+      border-radius: 4px !important;
+      border: 1px solid #e2e8f0 !important;
+    }
+    .pvtFilterBox {
+      border-radius: 8px !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    }
+
+    /* ========== FULLSCREEN MODE ========== */
+    .fullscreen-active .header,
+    .fullscreen-active .controls-bar {
+      display: none;
+    }
+    .fullscreen-active .main-content {
+      padding: 0;
+    }
+    .fullscreen-active #pivot-container {
+      border-radius: 0;
+      box-shadow: none;
+    }
+    #fullscreen-exit-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .fullscreen-active #fullscreen-exit-btn {
+      display: flex;
+    }
+
+    /* ========== LOADING STATE ========== */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+      color: #64748b;
+    }
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #0ea5e9;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ========== EMPTY STATE ========== */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #64748b;
+    }
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    .empty-state h2 {
+      font-size: 18px;
+      color: #334155;
+      margin-bottom: 8px;
+    }
+    .empty-state p {
+      font-size: 13px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    /* ========== FOOTER ========== */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      padding: 4px 12px;
+      font-size: 0.7em;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+      z-index: 1000;
+    }
+    footer a {
+      color: #0ea5e9;
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="header">
+    <h1>📊 <span data-i18n="title">Tableau Croisé Dynamique</span></h1>
+    <div class="header-actions">
+      <button class="lang-btn active" onclick="setLanguage('fr')">FR</button>
+      <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+    </div>
+  </header>
+
+  <!-- CONTROLS BAR -->
+  <div class="controls-bar">
+    <div class="control-group">
+      <label data-i18n="viewMode">Vue :</label>
+      <select id="view-mode-select">
+        <option value="pivot" data-i18n="viewPivot">Tableau Croisé</option>
+        <option value="fullscreen" data-i18n="viewFullscreen">Plein écran</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label data-i18n="columnSize">Taille colonnes :</label>
+      <select id="column-size-select">
+        <option value="1.0">Normal</option>
+        <option value="0.8">Compact</option>
+        <option value="0.6">Très compact</option>
+        <option value="0.4">Minimal</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <button class="btn btn-secondary" onclick="resetConfig()">
+        🔄 <span data-i18n="reset">Réinitialiser</span>
+      </button>
+      <button class="btn btn-secondary" onclick="exportCSV()">
+        📥 <span data-i18n="export">Exporter CSV</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- FULLSCREEN EXIT BUTTON -->
+  <button id="fullscreen-exit-btn" onclick="exitFullscreen()" title="Quitter le plein écran">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+    </svg>
+  </button>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <div id="pivot-container">
+      <!-- Loading state -->
+      <div id="loading-state" class="loading">
+        <div class="loading-spinner"></div>
+        <span data-i18n="loading">Chargement des données...</span>
+      </div>
+      
+      <!-- Empty state -->
+      <div id="empty-state" class="empty-state hidden">
+        <div class="empty-state-icon">📊</div>
+        <h2 data-i18n="emptyTitle">Aucune donnée</h2>
+        <p data-i18n="emptyDesc">Sélectionnez une table source dans les paramètres du widget pour commencer à créer votre tableau croisé dynamique.</p>
+      </div>
+      
+      <!-- Pivot table will be rendered here -->
+      <div id="pivot-table"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© 2026 Said Hamadou (isaytoo)</span>
+    <a href="https://gristup.fr" target="_blank">gristup.fr</a>
+  </footer>
+
+  <script src="widget.js"></script>
+</body>
+</html>
