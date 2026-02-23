@@ -197,112 +197,139 @@ function renderPivotTable(records, columns) {
 }
 
 function applyCustomTheme() {
-  // Apply isaytoo theme colors via CSS injection
+  // Apply isaytoo theme colors via CSS injection - softer, more readable
   const style = document.createElement('style');
   style.textContent = `
-    /* WebDataRocks isaytoo Theme */
+    /* WebDataRocks isaytoo Theme - Soft & Modern */
     #wdr-pivot-view .wdr-ui-element {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     }
     
     /* Toolbar */
     #wdr-toolbar {
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
-      border-bottom: 2px solid #0ea5e9 !important;
+      background: #ffffff !important;
+      border-bottom: 1px solid #e2e8f0 !important;
     }
     #wdr-toolbar .wdr-toolbar-group-content {
       gap: 4px !important;
     }
     #wdr-toolbar .wdr-ui-btn {
-      background: white !important;
+      background: #f8fafc !important;
       border: 1px solid #e2e8f0 !important;
       border-radius: 8px !important;
       color: #475569 !important;
       transition: all 0.2s ease !important;
     }
     #wdr-toolbar .wdr-ui-btn:hover {
-      background: #0ea5e9 !important;
+      background: #10b981 !important;
       color: white !important;
-      border-color: #0ea5e9 !important;
+      border-color: #10b981 !important;
     }
     
-    /* Grid headers */
+    /* Grid headers - softer green */
     .wdr-header, .wdr-header-r, .wdr-header-c {
-      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
-      color: white !important;
+      background: #f1f5f9 !important;
+      color: #334155 !important;
       font-weight: 600 !important;
+      border-bottom: 2px solid #10b981 !important;
     }
     
-    /* Totals */
+    /* Totals - soft yellow */
     .wdr-total, .wdr-grand-total {
-      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
-      color: #92400e !important;
+      background: #fefce8 !important;
+      color: #854d0e !important;
       font-weight: 700 !important;
     }
     
     /* Cells */
     .wdr-cell {
-      border-color: #e2e8f0 !important;
+      border-color: #f1f5f9 !important;
     }
     .wdr-cell:hover {
-      background: #f0f9ff !important;
+      background: #f0fdf4 !important;
     }
     
-    /* Configurator */
+    /* Configurator popup */
+    .wdr-popup {
+      border-radius: 12px !important;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+    }
     .wdr-popup-header {
-      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
-      color: white !important;
+      background: #ffffff !important;
+      color: #1e293b !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+      font-weight: 700 !important;
+    }
+    .wdr-popup-content {
+      background: #ffffff !important;
     }
     .wdr-fields-view-wrap {
-      background: #f8fafc !important;
-    }
-    .wdr-field {
-      background: white !important;
-      border: 1px solid #e2e8f0 !important;
-      border-radius: 6px !important;
-      margin: 4px !important;
-    }
-    .wdr-field:hover {
-      border-color: #0ea5e9 !important;
-      box-shadow: 0 2px 8px rgba(14, 165, 233, 0.15) !important;
-    }
-    .wdr-field.wdr-checked {
-      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
-      color: white !important;
-      border-color: #0284c7 !important;
+      background: #ffffff !important;
     }
     
-    /* Drop zones */
-    .wdr-fields-section-header {
-      background: #f1f5f9 !important;
-      color: #475569 !important;
-      font-weight: 700 !important;
-      text-transform: uppercase !important;
-      font-size: 11px !important;
-      letter-spacing: 0.5px !important;
-    }
-    .wdr-fields-section-content {
-      background: white !important;
-      border: 2px dashed #cbd5e1 !important;
+    /* Fields in configurator */
+    .wdr-field {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
       border-radius: 8px !important;
-      min-height: 60px !important;
+      margin: 4px !important;
+      padding: 8px 12px !important;
+      transition: all 0.2s ease !important;
     }
-    .wdr-fields-section-content:empty::before {
-      content: "Déposez un champ ici" !important;
-      color: #94a3b8 !important;
-      font-style: italic !important;
+    .wdr-field:hover {
+      border-color: #10b981 !important;
+      background: #f0fdf4 !important;
+    }
+    .wdr-field.wdr-checked {
+      background: #10b981 !important;
+      color: white !important;
+      border-color: #059669 !important;
+    }
+    .wdr-field.wdr-checked:hover {
+      background: #059669 !important;
+    }
+    
+    /* Drop zones headers */
+    .wdr-fields-section-header {
+      background: #f8fafc !important;
+      color: #64748b !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+      font-size: 10px !important;
+      letter-spacing: 0.5px !important;
+      padding: 8px 12px !important;
+      border-radius: 6px 6px 0 0 !important;
+    }
+    
+    /* Drop zones content */
+    .wdr-fields-section-content {
+      background: #fafafa !important;
+      border: 2px dashed #d1d5db !important;
+      border-radius: 0 0 8px 8px !important;
+      min-height: 50px !important;
+      padding: 8px !important;
     }
     
     /* Buttons */
     .wdr-ui-btn-primary {
-      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+      background: #10b981 !important;
       border: none !important;
       border-radius: 8px !important;
       color: white !important;
       font-weight: 600 !important;
+      padding: 10px 20px !important;
     }
     .wdr-ui-btn-primary:hover {
-      filter: brightness(1.1) !important;
+      background: #059669 !important;
+    }
+    .wdr-ui-btn-secondary {
+      background: #f1f5f9 !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 8px !important;
+      color: #475569 !important;
+    }
+    .wdr-ui-btn-secondary:hover {
+      background: #e2e8f0 !important;
     }
   `;
   document.head.appendChild(style);
