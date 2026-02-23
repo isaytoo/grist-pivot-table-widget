@@ -108,7 +108,13 @@ async function loadAvailableTables() {
 async function onTableSelect(tableName) {
   if (!tableName) return;
   selectedTableId = tableName;
-  grist.setOption('selectedTable', tableName).catch(console.error);
+  console.log('Saving selectedTable:', tableName);
+  try {
+    await grist.setOption('selectedTable', tableName);
+    console.log('selectedTable saved successfully');
+  } catch (e) {
+    console.error('Error saving selectedTable:', e);
+  }
   
   // Show loading
   document.getElementById('loading-state').classList.remove('hidden');
@@ -403,9 +409,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize when Grist is ready
 async function initWidget() {
+  console.log('initWidget started');
+  
   // Load saved options
   try {
     const savedLang = await grist.getOption('language');
+    console.log('savedLang:', savedLang);
     if (savedLang) {
       setLanguage(savedLang);
     }
@@ -422,11 +431,13 @@ async function initWidget() {
     }
     
     const savedConfig = await grist.getOption('pivotConfig');
+    console.log('savedConfig:', savedConfig);
     if (savedConfig) {
       currentConfig = savedConfig;
     }
     
     const savedTable = await grist.getOption('selectedTable');
+    console.log('savedTable:', savedTable);
     if (savedTable) {
       selectedTableId = savedTable;
     }
@@ -436,9 +447,11 @@ async function initWidget() {
   
   // Load available tables
   await loadAvailableTables();
+  console.log('Tables loaded, selectedTableId:', selectedTableId);
   
   // If a table was previously selected, load it
   if (selectedTableId) {
+    console.log('Loading saved table:', selectedTableId);
     onTableSelect(selectedTableId);
   } else {
     document.getElementById('loading-state').classList.add('hidden');
