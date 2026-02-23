@@ -141,42 +141,148 @@
     /* ========== PIVOT TABLE STYLES ========== */
     .pvtUi {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      width: 100% !important;
     }
-    .pvtAxisContainer, .pvtVals {
-      background: #f8fafc !important;
-      border: 1px dashed #cbd5e1 !important;
-      border-radius: 6px !important;
-      min-height: 60px !important;
+    .pvtUi table {
+      width: 100% !important;
     }
-    .pvtAxisContainer li span.pvtAttr {
+    
+    /* Zone des champs disponibles */
+    .pvtUnused {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+      border: 2px dashed #0ea5e9 !important;
+      border-radius: 12px !important;
+      padding: 12px !important;
+      min-height: 70px !important;
+      position: relative !important;
+    }
+    .pvtUnused::before {
+      content: "📦 Champs disponibles - Glissez vers les zones ci-dessous";
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: #0369a1;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Zone des lignes */
+    .pvtRows {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%) !important;
+      border: 2px dashed #22c55e !important;
+      border-radius: 12px !important;
+      padding: 12px !important;
+      min-height: 80px !important;
+      position: relative !important;
+    }
+    .pvtRows::before {
+      content: "📊 LIGNES - Déposez ici";
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #15803d;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Zone des colonnes */
+    .pvtCols {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+      border: 2px dashed #f59e0b !important;
+      border-radius: 12px !important;
+      padding: 12px !important;
+      min-height: 80px !important;
+      position: relative !important;
+    }
+    .pvtCols::before {
+      content: "📈 COLONNES - Déposez ici";
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #b45309;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Zone des valeurs */
+    .pvtVals {
+      background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%) !important;
+      border: 2px dashed #ec4899 !important;
+      border-radius: 12px !important;
+      padding: 12px !important;
+      min-height: 80px !important;
+    }
+    .pvtVals::before {
+      content: "🔢 VALEURS - Déposez ici pour calculer";
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #be185d;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Chips des champs */
+    .pvtAxisContainer li span.pvtAttr,
+    .pvtUnused li span.pvtAttr {
       background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
       color: white !important;
       border: none !important;
-      border-radius: 4px !important;
-      padding: 4px 8px !important;
-      font-size: 11px !important;
+      border-radius: 20px !important;
+      padding: 6px 14px !important;
+      font-size: 12px !important;
       font-weight: 600 !important;
+      cursor: grab !important;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+      transition: all 0.2s ease !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 4px !important;
     }
-    .pvtAxisContainer li span.pvtAttr:hover {
-      filter: brightness(1.1);
-    }
-    .pvtUnused li span.pvtAttr {
-      background: #e2e8f0 !important;
-      color: #475569 !important;
-    }
+    .pvtAxisContainer li span.pvtAttr:hover,
     .pvtUnused li span.pvtAttr:hover {
-      background: #cbd5e1 !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
     }
+    .pvtAxisContainer li span.pvtAttr:active,
+    .pvtUnused li span.pvtAttr:active {
+      cursor: grabbing !important;
+    }
+    
+    /* Chips dans les zones de dépôt */
+    .pvtRows li span.pvtAttr {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+    }
+    .pvtCols li span.pvtAttr {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    }
+    .pvtVals select {
+      background: white !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 6px !important;
+      padding: 4px 8px !important;
+      font-size: 12px !important;
+    }
+    
+    /* Tableau de résultats */
     .pvtTable {
       border-collapse: collapse !important;
-      font-size: 12px !important;
+      font-size: 13px !important;
+      margin-top: 16px !important;
+      border-radius: 8px !important;
+      overflow: hidden !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
     }
     .pvtTable th, .pvtTable td {
       border: 1px solid #e2e8f0 !important;
-      padding: 6px 10px !important;
+      padding: 8px 12px !important;
     }
     .pvtTable th {
-      background: #f1f5f9 !important;
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%) !important;
       font-weight: 600 !important;
       color: #334155 !important;
     }
@@ -184,19 +290,40 @@
       background: white !important;
     }
     .pvtTable .pvtTotal, .pvtTable .pvtGrandTotal {
-      background: #fef3c7 !important;
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
       font-weight: 700 !important;
+      color: #92400e !important;
     }
     .pvtRendererArea {
-      padding: 16px !important;
+      padding: 20px !important;
+      background: #f8fafc !important;
+      border-radius: 8px !important;
+      margin-top: 12px !important;
     }
     .pvtDropdown {
-      border-radius: 4px !important;
+      border-radius: 6px !important;
       border: 1px solid #e2e8f0 !important;
+      padding: 4px 8px !important;
     }
     .pvtFilterBox {
-      border-radius: 8px !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+      border-radius: 12px !important;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+      border: 1px solid #e2e8f0 !important;
+    }
+    
+    /* Sélecteurs d'agrégation et de rendu */
+    .pvtAggregator, .pvtRenderer {
+      background: white !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 6px !important;
+      padding: 6px 10px !important;
+      font-size: 12px !important;
+      cursor: pointer !important;
+    }
+    .pvtAggregator:focus, .pvtRenderer:focus {
+      outline: none !important;
+      border-color: #0ea5e9 !important;
+      box-shadow: 0 0 0 3px rgba(14,165,233,0.2) !important;
     }
 
     /* ========== FULLSCREEN MODE ========== */
