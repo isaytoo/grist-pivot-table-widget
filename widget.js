@@ -241,6 +241,9 @@ function renderPivotTable(records) {
   
   let firstRefresh = true;
   
+  // Check if we have a saved config to restore
+  const hasSavedConfig = currentConfig && (currentConfig.rows?.length > 0 || currentConfig.cols?.length > 0 || currentConfig.vals?.length > 0);
+  
   $('#pivot-table').pivotUI(
     records,
     {
@@ -286,7 +289,7 @@ function renderPivotTable(records) {
         }, 100);
       }
     },
-    false, // overwrite
+    true, // overwrite - force apply saved config
     'fr'   // locale
   );
 }
