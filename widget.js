@@ -163,54 +163,12 @@ function renderPivotTable(records, columns) {
       localization: currentLanguage === 'fr' ? 'https://cdn.webdatarocks.com/loc/fr.json' : undefined
     },
     beforetoolbarcreated: function(toolbar) {
-      // Remove fullscreen button (not allowed in Grist iframe)
+      // Get default tabs and remove fullscreen (not allowed in Grist iframe)
+      var defaultTabs = toolbar.getTabs();
       toolbar.getTabs = function() {
-        var tabs = [];
-        tabs.push({
-          id: "wdr-tab-connect",
-          title: "Connecter",
-          handler: "connectHandler",
-          icon: this.icons.connect
+        return defaultTabs.filter(function(tab) {
+          return tab.id !== "wdr-tab-fullscreen";
         });
-        tabs.push({
-          id: "wdr-tab-open",
-          title: "Ouvrir",
-          handler: "openHandler",
-          icon: this.icons.open
-        });
-        tabs.push({
-          id: "wdr-tab-save",
-          title: "Sauvegarder",
-          handler: "saveHandler",
-          icon: this.icons.save
-        });
-        tabs.push({
-          id: "wdr-tab-export",
-          title: "Exporter",
-          handler: "exportHandler",
-          icon: this.icons.export
-        });
-        tabs.push({ divider: true });
-        tabs.push({
-          id: "wdr-tab-format",
-          title: "Format",
-          handler: "formatHandler",
-          icon: this.icons.format
-        });
-        tabs.push({
-          id: "wdr-tab-options",
-          title: "Options",
-          handler: "optionsHandler",
-          icon: this.icons.options
-        });
-        tabs.push({
-          id: "wdr-tab-fields",
-          title: "Champs",
-          handler: "fieldsHandler",
-          icon: this.icons.fields
-        });
-        // Fullscreen removed - not allowed in Grist iframe
-        return tabs;
       };
     },
     reportcomplete: function() {
@@ -267,9 +225,14 @@ function applyCustomTheme() {
     #wdr-toolbar {
       background: #ffffff !important;
       border-bottom: 1px solid #e2e8f0 !important;
+      padding: 8px 12px !important;
+    }
+    #wdr-toolbar .wdr-toolbar-group {
+      flex-wrap: nowrap !important;
     }
     #wdr-toolbar .wdr-toolbar-group-content {
-      gap: 4px !important;
+      gap: 8px !important;
+      flex-wrap: wrap !important;
     }
     #wdr-toolbar .wdr-ui-btn {
       background: #f8fafc !important;
@@ -277,6 +240,15 @@ function applyCustomTheme() {
       border-radius: 8px !important;
       color: #475569 !important;
       transition: all 0.2s ease !important;
+      min-width: auto !important;
+      padding: 8px 12px !important;
+      white-space: nowrap !important;
+    }
+    #wdr-toolbar .wdr-ui-btn .wdr-ui-btn-text {
+      display: inline !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+      max-width: none !important;
     }
     #wdr-toolbar .wdr-ui-btn:hover {
       background: #10b981 !important;
