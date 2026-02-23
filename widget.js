@@ -75,8 +75,7 @@ let pivotInitialized = false;
 // =============================================================================
 
 grist.ready({
-  requiredAccess: 'read table',
-  columns: [],
+  requiredAccess: 'full',
   allowSelectBy: true
 });
 
