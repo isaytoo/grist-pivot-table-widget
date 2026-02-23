@@ -292,6 +292,27 @@ function applyCustomTheme() {
       border-bottom: 2px solid #10b981 !important;
     }
     
+    /* Hamburger menu button - more visible */
+    .wdr-grid-layout .wdr-ui-btn,
+    .wdr-sheet-menu-btn,
+    button[class*="menu"] {
+      background: #10b981 !important;
+      border: none !important;
+      border-radius: 6px !important;
+      color: white !important;
+      padding: 8px !important;
+      cursor: pointer !important;
+    }
+    .wdr-grid-layout .wdr-ui-btn:hover,
+    .wdr-sheet-menu-btn:hover {
+      background: #059669 !important;
+    }
+    .wdr-grid-layout .wdr-ui-btn svg,
+    .wdr-sheet-menu-btn svg {
+      fill: white !important;
+      stroke: white !important;
+    }
+    
     /* Totals - soft yellow */
     .wdr-total, .wdr-grand-total {
       background: #fefce8 !important;
