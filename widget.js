@@ -69,6 +69,8 @@ let currentViewMode = 'pivot';
 let lastRecords = null;
 let currentConfig = {};
 let pivotInitialized = false;
+let selectedTableId = null;
+let availableTables = [];
 
 // =============================================================================
 // GRIST INITIALIZATION
@@ -78,6 +80,62 @@ grist.ready({
   requiredAccess: 'full',
   allowSelectBy: true
 });
+
+// =============================================================================
+// TABLE SELECTOR
+// =============================================================================
+
+async function loadAvailableTables() {
+  try {
+    const tables = await grist.docApi.listTables();
+    availableTables = tables;
+    const select = document.getElementById('table-select');
+    if (select) {
+      select.innerHTML = '<option value="">' + (currentLang === 'fr' ? '-- Choisir une table --' : '-- Select a table --') + '</option>';
+      tables.forEach(tableName => {
+        const opt = document.createElement('option');
+        opt.value = tableName;
+        opt.textContent = tableName;
+        if (tableName === selectedTableId) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+  } catch (e) {
+    console.error('Error loading tables:', e);
+  }
+}
+
+async function onTableSelect(tableName) {
+  if (!tableName) return;
+  selectedTableId = tableName;
+  grist.setOption('selectedTable', tableName).catch(console.error);
+  
+  // Show loading
+  document.getElementById('loading-state').classList.remove('hidden');
+  document.getElementById('empty-state').classList.add('hidden');
+  document.getElementById('pivot-table').innerHTML = '';
+  
+  try {
+    const tableData = await grist.docApi.fetchTable(tableName);
+    // Convert column-based data to row-based records
+    const columns = Object.keys(tableData).filter(k => k !== 'id');
+    const numRows = tableData.id ? tableData.id.length : 0;
+    const records = [];
+    for (let i = 0; i < numRows; i++) {
+      const record = {};
+      columns.forEach(col => {
+        record[col] = tableData[col][i];
+      });
+      records.push(record);
+    }
+    lastRecords = records;
+    renderPivotTable(records);
+  } catch (e) {
+    console.error('Error fetching table:', e);
+    document.getElementById('loading-state').classList.add('hidden');
+    document.getElementById('empty-state').classList.remove('hidden');
+  }
+}
 
 // =============================================================================
 // CUSTOM AGGREGATORS
@@ -340,9 +398,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // GRIST DATA HANDLER
 // =============================================================================
 
-grist.onRecords(async function(records) {
-  lastRecords = records;
-  
+// Initialize when Grist is ready
+async function initWidget() {
   // Load saved options
   try {
     const savedLang = await grist.getOption('language');
@@ -365,12 +422,38 @@ grist.onRecords(async function(records) {
     if (savedConfig) {
       currentConfig = savedConfig;
     }
+    
+    const savedTable = await grist.getOption('selectedTable');
+    if (savedTable) {
+      selectedTableId = savedTable;
+    }
   } catch (e) {
     console.error('Error loading options:', e);
   }
   
-  // Render pivot table
-  renderPivotTable(records);
+  // Load available tables
+  await loadAvailableTables();
+  
+  // If a table was previously selected, load it
+  if (selectedTableId) {
+    onTableSelect(selectedTableId);
+  } else {
+    document.getElementById('loading-state').classList.add('hidden');
+    document.getElementById('empty-state').classList.remove('hidden');
+  }
+}
+
+// Also handle onRecords for when user selects table via Grist UI
+grist.onRecords(async function(records) {
+  if (records && records.length > 0) {
+    lastRecords = records;
+    renderPivotTable(records);
+  }
+});
+
+// Start initialization after DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(initWidget, 500);
 });
 
 // Add CSS animations

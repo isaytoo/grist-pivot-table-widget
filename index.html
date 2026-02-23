@@ -311,6 +311,12 @@
   <!-- CONTROLS BAR -->
   <div class="controls-bar">
     <div class="control-group">
+      <label>📋 Table :</label>
+      <select id="table-select" onchange="onTableSelect(this.value)">
+        <option value="">-- Choisir une table --</option>
+      </select>
+    </div>
+    <div class="control-group">
       <label data-i18n="viewMode">Vue :</label>
       <select id="view-mode-select">
         <option value="pivot" data-i18n="viewPivot">Tableau Croisé</option>
