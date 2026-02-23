@@ -197,7 +197,8 @@ function renderPivotTable(records, columns) {
       configuratorButton: true,
       showAggregationLabels: true,
       datePattern: 'dd/MM/yyyy',
-      showEmptyData: false
+      showEmptyData: false,
+      showDefaultSlice: false
     }
   });
 }
