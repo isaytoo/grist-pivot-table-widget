@@ -172,12 +172,20 @@ function renderPivotTable(records, columns) {
     }
   });
   
-  // Set data and empty slice after initialization
+  // Set data with explicitly empty slice - no auto-detection
   pivot.setReport({
     dataSource: {
       data: data
     },
-    slice: {},
+    slice: {
+      rows: [],
+      columns: [],
+      measures: [],
+      reportFilters: [],
+      drills: {},
+      sorting: {},
+      expands: {}
+    },
     options: {
       grid: {
         type: 'compact',
