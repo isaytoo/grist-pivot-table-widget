@@ -15,19 +15,12 @@
   <!-- Grist Plugin API -->
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
   
-  <!-- jQuery & jQuery UI for drag & drop -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
-  
-  <!-- PivotTable.js -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.23.0/pivot.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.23.0/pivot.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.23.0/pivot.fr.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.23.0/export_renderers.min.js"></script>
+  <!-- WebDataRocks -->
+  <link rel="stylesheet" href="https://cdn.webdatarocks.com/latest/webdatarocks.min.css">
+  <script src="https://cdn.webdatarocks.com/latest/webdatarocks.toolbar.min.js"></script>
+  <script src="https://cdn.webdatarocks.com/latest/webdatarocks.js"></script>
   
   <style>
-    /* ========== RESET & BASE ========== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -38,7 +31,6 @@
     }
     .hidden { display: none !important; }
 
-    /* ========== HEADER ========== */
     .header {
       background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
       color: white;
@@ -66,7 +58,6 @@
     .lang-btn:hover { background: rgba(255,255,255,0.3); }
     .lang-btn.active { background: white; color: #0284c7; }
 
-    /* ========== CONTROLS BAR ========== */
     .controls-bar {
       background: white;
       border-bottom: 1px solid #e2e8f0;
@@ -87,412 +78,29 @@
       color: #475569;
     }
     .control-group select {
-      padding: 5px 10px;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
+      padding: 6px 12px;
+      border: 2px solid #0ea5e9;
+      border-radius: 8px;
       font-size: 12px;
       background: white;
       cursor: pointer;
+      min-width: 150px;
     }
     .control-group select:focus {
       outline: none;
-      border-color: #0ea5e9;
-      box-shadow: 0 0 0 2px rgba(14,165,233,0.2);
+      box-shadow: 0 0 0 3px rgba(14,165,233,0.2);
     }
 
-    /* ========== BUTTONS ========== */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-      color: white;
-    }
-    .btn-primary:hover { filter: brightness(1.1); }
-    .btn-secondary {
-      background: #f1f5f9;
-      color: #475569;
-      border: 1px solid #e2e8f0;
-    }
-    .btn-secondary:hover { background: #e2e8f0; }
-
-    /* ========== MAIN CONTENT ========== */
     .main-content {
-      padding: 16px;
-    }
-
-    /* ========== PIVOT TABLE CONTAINER ========== */
-    #pivot-container {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      overflow: hidden;
-    }
-
-    /* ========== PIVOT TABLE STYLES ========== */
-    .pvtUi {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-      width: 100% !important;
-    }
-    .pvtUi table {
-      width: 100% !important;
-    }
-    
-    /* Cacher le champ manualSort */
-    .pvtAttr[data-attrname="manualSort"],
-    li:has(.pvtAttr[data-attrname="manualSort"]),
-    span.pvtAttr:contains("manualSort") {
-      display: none !important;
-    }
-    
-    /* Zone des champs disponibles */
-    .pvtUnused {
-      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
-      border: 3px dashed #0ea5e9 !important;
-      border-radius: 16px !important;
-      padding: 16px !important;
-      min-height: 80px !important;
-      position: relative !important;
-      margin-bottom: 16px !important;
-    }
-    .pvtUnused::before {
-      content: "📦 CHAMPS DISPONIBLES";
-      display: block;
-      font-size: 13px;
-      font-weight: 700;
-      color: #0369a1;
-      margin-bottom: 4px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .pvtUnused::after {
-      content: "👆 Glissez les champs vers les zones colorées ci-dessous";
-      display: block;
-      font-size: 11px;
-      font-weight: 500;
-      color: #0284c7;
-      margin-bottom: 12px;
-      font-style: italic;
-    }
-    
-    /* Meilleur espacement des chips */
-    .pvtUnused li {
-      display: inline-block !important;
-      margin: 4px !important;
-    }
-    
-    /* Zone des lignes - à gauche verticalement */
-    .pvtRows {
-      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%) !important;
-      border: 3px solid #22c55e !important;
-      border-radius: 16px !important;
-      padding: 16px !important;
-      min-height: 100px !important;
-      position: relative !important;
-      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2) !important;
-    }
-    .pvtRows::before {
-      content: "⬇️ LIGNES";
-      display: block;
-      font-size: 14px;
-      font-weight: 800;
-      color: white;
-      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-      padding: 6px 12px;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .pvtRows:empty::after,
-    .pvtRows:not(:has(li))::after {
-      content: "Déposez ici pour grouper verticalement";
-      display: block;
-      font-size: 11px;
-      color: #15803d;
-      font-style: italic;
-      text-align: center;
-      padding: 20px;
-    }
-    
-    /* Zone des colonnes - en haut horizontalement */
-    .pvtCols {
-      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
-      border: 3px solid #f59e0b !important;
-      border-radius: 16px !important;
-      padding: 16px !important;
-      min-height: 100px !important;
-      position: relative !important;
-      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2) !important;
-    }
-    .pvtCols::before {
-      content: "➡️ COLONNES";
-      display: block;
-      font-size: 14px;
-      font-weight: 800;
-      color: white;
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      padding: 6px 12px;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .pvtCols:empty::after,
-    .pvtCols:not(:has(li))::after {
-      content: "Déposez ici pour grouper horizontalement";
-      display: block;
-      font-size: 11px;
-      color: #b45309;
-      font-style: italic;
-      text-align: center;
-      padding: 20px;
-    }
-    
-    /* Zone des valeurs - calculs */
-    .pvtVals {
-      background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%) !important;
-      border: 3px solid #ec4899 !important;
-      border-radius: 16px !important;
-      padding: 16px !important;
-      min-height: 100px !important;
-      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.2) !important;
-    }
-    .pvtVals::before {
-      content: "🔢 VALEURS À CALCULER";
-      display: block;
-      font-size: 14px;
-      font-weight: 800;
-      color: white;
-      background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
-      padding: 6px 12px;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    /* Chips des champs */
-    .pvtAxisContainer li span.pvtAttr,
-    .pvtUnused li span.pvtAttr {
-      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
-      color: white !important;
-      border: none !important;
-      border-radius: 20px !important;
-      padding: 6px 14px !important;
-      font-size: 12px !important;
-      font-weight: 600 !important;
-      cursor: grab !important;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-      transition: all 0.2s ease !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 4px !important;
-    }
-    .pvtAxisContainer li span.pvtAttr:hover,
-    .pvtUnused li span.pvtAttr:hover {
-      transform: translateY(-2px) !important;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
-    }
-    .pvtAxisContainer li span.pvtAttr:active,
-    .pvtUnused li span.pvtAttr:active {
-      cursor: grabbing !important;
-    }
-    
-    /* Chips dans les zones de dépôt */
-    .pvtRows li span.pvtAttr {
-      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
-    }
-    .pvtCols li span.pvtAttr {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
-    }
-    .pvtVals select {
-      background: white !important;
-      border: 1px solid #e2e8f0 !important;
-      border-radius: 6px !important;
-      padding: 4px 8px !important;
-      font-size: 12px !important;
-    }
-    
-    /* Tableau de résultats */
-    .pvtTable {
-      border-collapse: collapse !important;
-      font-size: 13px !important;
-      margin-top: 16px !important;
-      border-radius: 8px !important;
-      overflow: hidden !important;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-    }
-    .pvtTable th, .pvtTable td {
-      border: 1px solid #e2e8f0 !important;
-      padding: 8px 12px !important;
-    }
-    .pvtTable th {
-      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%) !important;
-      font-weight: 600 !important;
-      color: #334155 !important;
-    }
-    .pvtTable td {
-      background: white !important;
-    }
-    .pvtTable .pvtTotal, .pvtTable .pvtGrandTotal {
-      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
-      font-weight: 700 !important;
-      color: #92400e !important;
-    }
-    .pvtRendererArea {
-      padding: 20px !important;
-      background: #f8fafc !important;
-      border-radius: 8px !important;
-      margin-top: 12px !important;
-    }
-    .pvtDropdown {
-      border-radius: 8px !important;
-      border: 2px solid #e2e8f0 !important;
-      padding: 6px 12px !important;
-      background: white !important;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
-    }
-    .pvtDropdown:hover {
-      border-color: #0ea5e9 !important;
-    }
-    .pvtFilterBox {
-      border-radius: 12px !important;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
-      border: 1px solid #e2e8f0 !important;
-    }
-    
-    /* Tous les sélecteurs dans la zone pivot */
-    .pvtUi select,
-    .pvtRenderer,
-    .pvtAggregator {
-      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
-      border: 2px solid #0ea5e9 !important;
-      border-radius: 10px !important;
-      padding: 10px 16px !important;
-      font-size: 13px !important;
-      font-weight: 600 !important;
-      color: #0369a1 !important;
-      cursor: pointer !important;
-      transition: all 0.2s ease !important;
-      box-shadow: 0 2px 8px rgba(14, 165, 233, 0.15) !important;
-      appearance: none !important;
-      -webkit-appearance: none !important;
-      -moz-appearance: none !important;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230ea5e9' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
-      background-repeat: no-repeat !important;
-      background-position: right 12px center !important;
-      padding-right: 36px !important;
-      min-width: 140px !important;
-    }
-    .pvtUi select:hover,
-    .pvtRenderer:hover,
-    .pvtAggregator:hover {
-      background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%) !important;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230284c7' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
-      background-repeat: no-repeat !important;
-      background-position: right 12px center !important;
-      transform: translateY(-1px) !important;
-      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25) !important;
-    }
-    .pvtUi select:focus,
-    .pvtRenderer:focus,
-    .pvtAggregator:focus {
-      outline: none !important;
-      border-color: #0284c7 !important;
-      box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.25) !important;
-    }
-    
-    /* Style spécifique pour l'agrégateur (rose) */
-    .pvtVals select {
-      background: linear-gradient(135deg, #ffffff 0%, #fce7f3 100%) !important;
-      border: 2px solid #ec4899 !important;
-      color: #be185d !important;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ec4899' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
-      background-repeat: no-repeat !important;
-      background-position: right 12px center !important;
-      box-shadow: 0 2px 8px rgba(236, 72, 153, 0.15) !important;
-    }
-    .pvtVals select:hover {
-      background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%) !important;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23db2777' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
-      background-repeat: no-repeat !important;
-      background-position: right 12px center !important;
-      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.25) !important;
-    }
-    .pvtVals select:focus {
-      border-color: #db2777 !important;
-      box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.25) !important;
-    }
-    
-    /* Labels pour les sélecteurs dans VALEURS */
-    .pvtVals td:first-child::before {
-      content: "Calcul :";
-      display: block;
-      font-size: 10px;
-      font-weight: 700;
-      color: #be185d;
-      margin-bottom: 4px;
-      text-transform: uppercase;
-    }
-    .pvtVals td:nth-child(2)::before {
-      content: "Champ à calculer :";
-      display: block;
-      font-size: 10px;
-      font-weight: 700;
-      color: #be185d;
-      margin-bottom: 4px;
-      text-transform: uppercase;
-    }
-
-    /* ========== FULLSCREEN MODE ========== */
-    .fullscreen-active .header,
-    .fullscreen-active .controls-bar {
-      display: none;
-    }
-    .fullscreen-active .main-content {
       padding: 0;
-    }
-    .fullscreen-active #pivot-container {
-      border-radius: 0;
-      box-shadow: none;
-    }
-    #fullscreen-exit-btn {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 1000;
-      background: rgba(0,0,0,0.7);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      cursor: pointer;
-      display: none;
-      align-items: center;
-      justify-content: center;
-    }
-    .fullscreen-active #fullscreen-exit-btn {
-      display: flex;
+      height: calc(100vh - 100px);
     }
 
-    /* ========== LOADING STATE ========== */
+    #pivot-container {
+      width: 100%;
+      height: 100%;
+    }
+
     .loading {
       display: flex;
       flex-direction: column;
@@ -510,32 +118,17 @@
       animation: spin 1s linear infinite;
       margin-bottom: 16px;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ========== EMPTY STATE ========== */
     .empty-state {
       text-align: center;
       padding: 60px 20px;
       color: #64748b;
     }
-    .empty-state-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-    }
-    .empty-state h2 {
-      font-size: 18px;
-      color: #334155;
-      margin-bottom: 8px;
-    }
-    .empty-state p {
-      font-size: 13px;
-      max-width: 400px;
-      margin: 0 auto;
-    }
+    .empty-state-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-state h2 { font-size: 18px; color: #334155; margin-bottom: 8px; }
+    .empty-state p { font-size: 13px; max-width: 400px; margin: 0 auto; }
 
-    /* ========== FOOTER ========== */
     footer {
       position: fixed;
       bottom: 0;
@@ -550,17 +143,14 @@
       justify-content: space-between;
       z-index: 1000;
     }
-    footer a {
-      color: #0ea5e9;
-      text-decoration: none;
-    }
-    footer a:hover {
-      text-decoration: underline;
-    }
+    footer a { color: #0ea5e9; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* WebDataRocks customization */
+    #wdr-component { height: 100% !important; }
   </style>
 </head>
 <body>
-  <!-- HEADER -->
   <header class="header">
     <h1>📊 <span data-i18n="title">Tableau Croisé Dynamique</span></h1>
     <div class="header-actions">
@@ -569,7 +159,6 @@
     </div>
   </header>
 
-  <!-- CONTROLS BAR -->
   <div class="controls-bar">
     <div class="control-group">
       <label>📋 Table :</label>
@@ -577,61 +166,23 @@
         <option value="">-- Choisir une table --</option>
       </select>
     </div>
-    <div class="control-group">
-      <label data-i18n="viewMode">Vue :</label>
-      <select id="view-mode-select">
-        <option value="pivot" data-i18n="viewPivot">Tableau Croisé</option>
-        <option value="fullscreen" data-i18n="viewFullscreen">Plein écran</option>
-      </select>
-    </div>
-    <div class="control-group">
-      <label data-i18n="columnSize">Taille colonnes :</label>
-      <select id="column-size-select">
-        <option value="1.0">Normal</option>
-        <option value="0.8">Compact</option>
-        <option value="0.6">Très compact</option>
-        <option value="0.4">Minimal</option>
-      </select>
-    </div>
-    <div class="control-group">
-      <button class="btn btn-secondary" onclick="resetConfig()">
-        🔄 <span data-i18n="reset">Réinitialiser</span>
-      </button>
-      <button class="btn btn-secondary" onclick="exportCSV()">
-        📥 <span data-i18n="export">Exporter CSV</span>
-      </button>
-    </div>
   </div>
 
-  <!-- FULLSCREEN EXIT BUTTON -->
-  <button id="fullscreen-exit-btn" onclick="exitFullscreen()" title="Quitter le plein écran">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-    </svg>
-  </button>
-
-  <!-- MAIN CONTENT -->
   <div class="main-content">
-    <div id="pivot-container">
-      <!-- Loading state -->
-      <div id="loading-state" class="loading">
-        <div class="loading-spinner"></div>
-        <span data-i18n="loading">Chargement des données...</span>
-      </div>
-      
-      <!-- Empty state -->
-      <div id="empty-state" class="empty-state hidden">
-        <div class="empty-state-icon">📊</div>
-        <h2 data-i18n="emptyTitle">Aucune donnée</h2>
-        <p data-i18n="emptyDesc">Sélectionnez une table source dans les paramètres du widget pour commencer à créer votre tableau croisé dynamique.</p>
-      </div>
-      
-      <!-- Pivot table will be rendered here -->
-      <div id="pivot-table"></div>
+    <div id="loading-state" class="loading">
+      <div class="loading-spinner"></div>
+      <span>Chargement des données...</span>
     </div>
+    
+    <div id="empty-state" class="empty-state hidden">
+      <div class="empty-state-icon">📊</div>
+      <h2>Aucune donnée</h2>
+      <p>Sélectionnez une table source pour commencer à créer votre tableau croisé dynamique.</p>
+    </div>
+    
+    <div id="pivot-container"></div>
   </div>
 
-  <!-- FOOTER -->
   <footer>
     <span>© 2026 Said Hamadou (isaytoo)</span>
     <a href="https://gristup.fr" target="_blank">gristup.fr</a>
