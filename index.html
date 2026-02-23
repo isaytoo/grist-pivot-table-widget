@@ -349,9 +349,14 @@
       margin-top: 12px !important;
     }
     .pvtDropdown {
-      border-radius: 6px !important;
-      border: 1px solid #e2e8f0 !important;
-      padding: 4px 8px !important;
+      border-radius: 8px !important;
+      border: 2px solid #e2e8f0 !important;
+      padding: 6px 12px !important;
+      background: white !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+    }
+    .pvtDropdown:hover {
+      border-color: #0ea5e9 !important;
     }
     .pvtFilterBox {
       border-radius: 12px !important;
@@ -359,15 +364,52 @@
       border: 1px solid #e2e8f0 !important;
     }
     
-    /* Sélecteurs d'agrégation et de rendu */
-    .pvtAggregator, .pvtRenderer {
-      background: white !important;
-      border: 1px solid #e2e8f0 !important;
-      border-radius: 6px !important;
-      padding: 6px 10px !important;
-      font-size: 12px !important;
+    /* Sélecteur de type de rendu (Table, Carte de chaleur, etc.) */
+    .pvtRenderer {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+      border: 2px solid #0ea5e9 !important;
+      border-radius: 10px !important;
+      padding: 8px 14px !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      color: #0369a1 !important;
       cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      box-shadow: 0 2px 6px rgba(14, 165, 233, 0.15) !important;
     }
+    .pvtRenderer:hover {
+      background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%) !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25) !important;
+    }
+    .pvtRenderer:focus {
+      outline: none !important;
+      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3) !important;
+    }
+    
+    /* Sélecteur d'agrégation (Somme, Moyenne, etc.) */
+    .pvtAggregator {
+      background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%) !important;
+      border: 2px solid #ec4899 !important;
+      border-radius: 10px !important;
+      padding: 8px 14px !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      color: #be185d !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      box-shadow: 0 2px 6px rgba(236, 72, 153, 0.15) !important;
+    }
+    .pvtAggregator:hover {
+      background: linear-gradient(135deg, #fbcfe8 0%, #f9a8d4 100%) !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.25) !important;
+    }
+    .pvtAggregator:focus {
+      outline: none !important;
+      box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.3) !important;
+    }
+    
     .pvtAggregator:focus, .pvtRenderer:focus {
       outline: none !important;
       border-color: #0ea5e9 !important;
