@@ -162,6 +162,57 @@ function renderPivotTable(records, columns) {
     global: {
       localization: currentLanguage === 'fr' ? 'https://cdn.webdatarocks.com/loc/fr.json' : undefined
     },
+    beforetoolbarcreated: function(toolbar) {
+      // Remove fullscreen button (not allowed in Grist iframe)
+      toolbar.getTabs = function() {
+        var tabs = [];
+        tabs.push({
+          id: "wdr-tab-connect",
+          title: "Connecter",
+          handler: "connectHandler",
+          icon: this.icons.connect
+        });
+        tabs.push({
+          id: "wdr-tab-open",
+          title: "Ouvrir",
+          handler: "openHandler",
+          icon: this.icons.open
+        });
+        tabs.push({
+          id: "wdr-tab-save",
+          title: "Sauvegarder",
+          handler: "saveHandler",
+          icon: this.icons.save
+        });
+        tabs.push({
+          id: "wdr-tab-export",
+          title: "Exporter",
+          handler: "exportHandler",
+          icon: this.icons.export
+        });
+        tabs.push({ divider: true });
+        tabs.push({
+          id: "wdr-tab-format",
+          title: "Format",
+          handler: "formatHandler",
+          icon: this.icons.format
+        });
+        tabs.push({
+          id: "wdr-tab-options",
+          title: "Options",
+          handler: "optionsHandler",
+          icon: this.icons.options
+        });
+        tabs.push({
+          id: "wdr-tab-fields",
+          title: "Champs",
+          handler: "fieldsHandler",
+          icon: this.icons.fields
+        });
+        // Fullscreen removed - not allowed in Grist iframe
+        return tabs;
+      };
+    },
     reportcomplete: function() {
       // Apply custom theme after render
       applyCustomTheme();
