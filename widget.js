@@ -124,7 +124,9 @@ async function onTableSelect(tableName) {
   try {
     const tableData = await grist.docApi.fetchTable(tableName);
     // Convert column-based data to row-based records
-    const columns = Object.keys(tableData).filter(k => k !== 'id');
+    // Filter out internal Grist columns like 'id' and 'manualSort'
+    const columnsToHide = ['id', 'manualSort'];
+    const columns = Object.keys(tableData).filter(k => !columnsToHide.includes(k));
     const numRows = tableData.id ? tableData.id.length : 0;
     const records = [];
     for (let i = 0; i < numRows; i++) {

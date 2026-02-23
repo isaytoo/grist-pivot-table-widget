@@ -147,6 +147,13 @@
       width: 100% !important;
     }
     
+    /* Cacher le champ manualSort */
+    .pvtAttr[data-attrname="manualSort"],
+    li:has(.pvtAttr[data-attrname="manualSort"]),
+    span.pvtAttr:contains("manualSort") {
+      display: none !important;
+    }
+    
     /* Zone des champs disponibles */
     .pvtUnused {
       background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
@@ -175,6 +182,12 @@
       color: #0284c7;
       margin-bottom: 12px;
       font-style: italic;
+    }
+    
+    /* Meilleur espacement des chips */
+    .pvtUnused li {
+      display: inline-block !important;
+      margin: 4px !important;
     }
     
     /* Zone des lignes - à gauche verticalement */
