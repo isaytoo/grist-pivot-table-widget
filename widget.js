@@ -153,35 +153,12 @@ function renderPivotTable(records, columns) {
   // Prepare data for WebDataRocks
   const data = records;
   
-  // Create WebDataRocks pivot with modern theme
+  // Create WebDataRocks pivot with modern theme - start completely empty
   pivot = new WebDataRocks({
     container: '#pivot-container',
     toolbar: true,
     height: '100%',
     width: '100%',
-    report: {
-      dataSource: {
-        data: data
-      },
-      slice: {
-        rows: [],
-        columns: [],
-        measures: []
-      },
-      options: {
-        grid: {
-          type: 'compact',
-          showTotals: 'on',
-          showGrandTotals: 'on',
-          showHeaders: true
-        },
-        configuratorActive: false,
-        configuratorButton: true,
-        showAggregationLabels: true,
-        datePattern: 'dd/MM/yyyy',
-        showEmptyData: false
-      }
-    },
     global: {
       localization: currentLanguage === 'fr' ? 'https://cdn.webdatarocks.com/loc/fr.json' : undefined
     },
@@ -192,6 +169,27 @@ function renderPivotTable(records, columns) {
     reportchange: function() {
       // Save configuration when report changes
       saveConfiguration();
+    }
+  });
+  
+  // Set data and empty slice after initialization
+  pivot.setReport({
+    dataSource: {
+      data: data
+    },
+    slice: {},
+    options: {
+      grid: {
+        type: 'compact',
+        showTotals: 'on',
+        showGrandTotals: 'on',
+        showHeaders: true
+      },
+      configuratorActive: true,
+      configuratorButton: true,
+      showAggregationLabels: true,
+      datePattern: 'dd/MM/yyyy',
+      showEmptyData: false
     }
   });
 }
