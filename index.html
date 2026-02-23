@@ -426,6 +426,26 @@
       border-color: #db2777 !important;
       box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.25) !important;
     }
+    
+    /* Labels pour les sélecteurs dans VALEURS */
+    .pvtVals td:first-child::before {
+      content: "Calcul :";
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      color: #be185d;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .pvtVals td:nth-child(2)::before {
+      content: "Champ à calculer :";
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      color: #be185d;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
 
     /* ========== FULLSCREEN MODE ========== */
     .fullscreen-active .header,
