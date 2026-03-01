@@ -107,18 +107,25 @@ async function onTableSelect(tableName) {
   document.getElementById('pivot-container').innerHTML = '';
   
   try {
-    const tableData = await grist.docApi.fetchTable(tableName);
+    // Fetch table data and column metadata
+    const [tableData, columnsMetadata] = await Promise.all([
+      grist.docApi.fetchTable(tableName),
+      fetchColumnMetadata(tableName)
+    ]);
     
     // Convert column-based data to row-based records
     const columnsToHide = ['id', 'manualSort'];
     const columns = Object.keys(tableData).filter(k => !columnsToHide.includes(k));
     const numRows = tableData.id ? tableData.id.length : 0;
-    const records = [];
     
+    // Resolve Reference columns and format dates
+    const resolvedData = await resolveReferencesAndDates(tableData, columns, columnsMetadata, numRows);
+    
+    const records = [];
     for (let i = 0; i < numRows; i++) {
       const record = {};
       columns.forEach(col => {
-        record[col] = tableData[col][i];
+        record[col] = resolvedData[col][i];
       });
       records.push(record);
     }
@@ -130,6 +137,164 @@ async function onTableSelect(tableName) {
     document.getElementById('loading-state').classList.add('hidden');
     document.getElementById('empty-state').classList.remove('hidden');
   }
+}
+
+// Fetch column metadata to identify Reference and Date columns
+async function fetchColumnMetadata(tableName) {
+  try {
+    const tables = await grist.docApi.fetchTable('_grist_Tables');
+    const tableIdx = tables.tableId.indexOf(tableName);
+    if (tableIdx === -1) return {};
+    
+    const tableRef = tables.id[tableIdx];
+    const cols = await grist.docApi.fetchTable('_grist_Tables_column');
+    
+    const metadata = {};
+    for (let i = 0; i < cols.id.length; i++) {
+      if (cols.parentId[i] === tableRef) {
+        const colId = cols.colId[i];
+        const colType = cols.type[i] || '';
+        metadata[colId] = {
+          type: colType,
+          displayCol: cols.displayCol ? cols.displayCol[i] : null
+        };
+      }
+    }
+    return metadata;
+  } catch (e) {
+    console.error('Error fetching column metadata:', e);
+    return {};
+  }
+}
+
+// Resolve Reference columns to display values and format dates
+async function resolveReferencesAndDates(tableData, columns, columnsMetadata, numRows) {
+  const resolvedData = {};
+  const refTablesToFetch = {};
+  
+  // Identify Reference columns and their target tables
+  columns.forEach(col => {
+    const meta = columnsMetadata[col];
+    if (meta && meta.type) {
+      // Reference column: type is "Ref:TableName" or "RefList:TableName"
+      const refMatch = meta.type.match(/^Ref(?:List)?:(.+)$/);
+      if (refMatch) {
+        const targetTable = refMatch[1];
+        if (!refTablesToFetch[targetTable]) {
+          refTablesToFetch[targetTable] = [];
+        }
+        refTablesToFetch[targetTable].push(col);
+      }
+    }
+  });
+  
+  // Fetch referenced tables
+  const refTableData = {};
+  for (const targetTable of Object.keys(refTablesToFetch)) {
+    try {
+      refTableData[targetTable] = await grist.docApi.fetchTable(targetTable);
+    } catch (e) {
+      console.warn(`Could not fetch reference table ${targetTable}:`, e);
+    }
+  }
+  
+  // Process each column
+  columns.forEach(col => {
+    const meta = columnsMetadata[col];
+    const values = tableData[col];
+    
+    if (!meta || !meta.type) {
+      // No metadata, keep as-is
+      resolvedData[col] = values;
+      return;
+    }
+    
+    // Handle Reference columns
+    const refMatch = meta.type.match(/^Ref:(.+)$/);
+    if (refMatch) {
+      const targetTable = refMatch[1];
+      const targetData = refTableData[targetTable];
+      
+      if (targetData && targetData.id) {
+        // Build ID to display value map (use first text column or id)
+        const displayCol = findDisplayColumn(targetData);
+        const idToValue = {};
+        for (let i = 0; i < targetData.id.length; i++) {
+          idToValue[targetData.id[i]] = displayCol ? targetData[displayCol][i] : targetData.id[i];
+        }
+        
+        // Resolve references
+        resolvedData[col] = values.map(v => {
+          if (v === null || v === undefined || v === 0) return '';
+          return idToValue[v] !== undefined ? idToValue[v] : v;
+        });
+      } else {
+        resolvedData[col] = values;
+      }
+      return;
+    }
+    
+    // Handle RefList columns
+    const refListMatch = meta.type.match(/^RefList:(.+)$/);
+    if (refListMatch) {
+      const targetTable = refListMatch[1];
+      const targetData = refTableData[targetTable];
+      
+      if (targetData && targetData.id) {
+        const displayCol = findDisplayColumn(targetData);
+        const idToValue = {};
+        for (let i = 0; i < targetData.id.length; i++) {
+          idToValue[targetData.id[i]] = displayCol ? targetData[displayCol][i] : targetData.id[i];
+        }
+        
+        resolvedData[col] = values.map(v => {
+          if (!v || !Array.isArray(v) || v.length === 0) return '';
+          // RefList is ['L', id1, id2, ...] format
+          const ids = v[0] === 'L' ? v.slice(1) : v;
+          return ids.map(id => idToValue[id] !== undefined ? idToValue[id] : id).join(', ');
+        });
+      } else {
+        resolvedData[col] = values;
+      }
+      return;
+    }
+    
+    // Handle Date and DateTime columns
+    if (meta.type === 'Date' || meta.type.startsWith('DateTime')) {
+      resolvedData[col] = values.map(v => {
+        if (v === null || v === undefined) return '';
+        // Grist stores dates as Unix timestamps (seconds since epoch)
+        const date = new Date(v * 1000);
+        if (isNaN(date.getTime())) return v;
+        // Format as DD/MM/YYYY
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        if (meta.type.startsWith('DateTime')) {
+          const hours = String(date.getHours()).padStart(2, '0');
+          const mins = String(date.getMinutes()).padStart(2, '0');
+          return `${day}/${month}/${year} ${hours}:${mins}`;
+        }
+        return `${day}/${month}/${year}`;
+      });
+      return;
+    }
+    
+    // Default: keep as-is
+    resolvedData[col] = values;
+  });
+  
+  return resolvedData;
+}
+
+// Find the best column to display for a reference (first text-like column)
+function findDisplayColumn(tableData) {
+  const cols = Object.keys(tableData).filter(k => k !== 'id' && k !== 'manualSort');
+  // Prefer columns that look like names
+  const nameCol = cols.find(c => /name|nom|titre|title|label/i.test(c));
+  if (nameCol) return nameCol;
+  // Otherwise use first non-id column
+  return cols[0] || null;
 }
 
 // =============================================================================
